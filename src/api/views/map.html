@@ -9,17 +9,12 @@
     <div id="map" style="width: 100%; height: 400px;"></div>
 
     <script id="initiate-map">
-      let map;
-      let lat = "<%=latitude%>",
-        lng = "<%=longitude%>",
-        zoom = "<%=zoom%>";
 
       async function initMap() {
         const { Map } = await google.maps.importLibrary("maps");
-        console.log("janu", Map);
-        map = new Map(document.getElementById("map"), {
-          center: { lat: parseInt(lat, 10), lng: parseInt(lng, 10) },
-          zoom: parseInt(zoom, 10),
+        new Map(document.getElementById("map"), {
+          center: { lat: parseInt("<%=latitude%>", 10), lng: parseInt("<%=longitude%>", 10) },
+          zoom: parseInt("<%=zoom%>", 10),
         });
       }
 

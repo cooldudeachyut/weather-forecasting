@@ -13,7 +13,6 @@ const App = (props) => {
   const clickHandler = async (ev) => {
     ev.preventDefault();
     const location = document.getElementById("search-location").value;
-    console.log(location);
     let weatherDetails;
 
     try {
@@ -32,7 +31,6 @@ const App = (props) => {
       );
       weatherDetails = await weatherResponse.json();
 
-      console.log(weatherDetails);
     } catch (error) {
       console.log(error.message);
     }
@@ -45,14 +43,14 @@ const App = (props) => {
     <div className="App">
       <header className="App_header">
         <div className="searchBar">
-          <form id="location-search-form">
-            <label for="search-location">Location</label>
-            <input id="search-location"></input>
-            <button type="submit" onClick={clickHandler}>
+          <form id="location-search-form" className="searchForm">
+            <label htmlFor="search-location" className="searchFormElement">Location</label>
+            <input id="search-location" className="searchFormElement"></input>
+            <button type="submit" className="searchFormElement" onClick={clickHandler}>
               Search
             </button>
           </form>
-          <img id="weather-image" src=""></img>
+          <img id="weather-image" src="" className="searchFormElement"></img>
         </div>
         <Map geoLocation={geoLocation} zoom={ZOOM} />
       </header>

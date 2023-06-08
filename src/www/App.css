@@ -17,11 +17,20 @@
 }
 
 .searchBar {
+  padding: 20px;
+  margin: 10px;
+}
+
+.searchForm {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin: 10px;
+}
+
+.searchFormElement {
+  margin: 5px
 }
 
 .App-button {
