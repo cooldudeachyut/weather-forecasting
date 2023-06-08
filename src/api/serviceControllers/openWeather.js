@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+import fetch from "node-fetch"
 
 export default (req, res) => {
     const { lat, lng } = req.query

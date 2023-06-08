@@ -1,31 +1,35 @@
-const express = require('express')
-require('dotenv').config()
-const postgres = require('@metamodules/postgres')()
+import googlePlaces from "./serviceControllers/googlePlaces.js";
+import openWeather from "./serviceControllers/openWeather.js";
+import express from "express";
+import dotenv from "dotenv";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import ejs from "ejs";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config();
 
-const app = express()
-const port = 4000
+const app = express();
+const port = 4000;
 
-postgres.query(`CREATE TABLE IF NOT EXISTS clicks (
-  id BIGSERIAL PRIMARY KEY,
-  created_at TIMESTAMP DEFAULT NOW()
-)`)
+app.engine("html", ejs.renderFile);
+app.set("view engine", "html");
 
-app.get('/api/count', (req, res) => {
-  postgres.query('SELECT count(*) AS count FROM clicks', (err, resp) => {
-    res.send({ count: resp.rows[0].count || 0 })
-  })
-})
+app.get("/api/v1/googlePlaces", googlePlaces);
 
-app.post('/api/count/increment', (req, res) => {
-  postgres.query('INSERT INTO clicks DEFAULT VALUES', (err, insert) => {
-    postgres.query('SELECT count(*) AS count FROM clicks', (err, resp) => {
-      res.send({ count: resp.rows[0].count || 0 })
-    })
-  })
-})
+app.get("/api/v1/weather", openWeather);
 
-app.get('/api/v1/googlePlaces', (req, res) => googlePlaces)
+app.get("/map", (req, res) => {
+  const { GOOGLEMAPS_API_KEY } = process.env;
+  const { lat: latitude, lng: longitude, zoom = '8' } = req.query;
+  res.render(__dirname + "/views/map.html", {
+    googleAPIKey: GOOGLEMAPS_API_KEY,
+    latitude,
+    longitude,
+    zoom
+  });
+});
 
-app.get('/api/v1/weather', (req, res) => openWeather)
-
-app.listen(port, () => console.log(`Example backend API listening on port ${port}!`))
+app.listen(port, () =>
+  console.log(`Backend API listening on port ${port}!`)
+);

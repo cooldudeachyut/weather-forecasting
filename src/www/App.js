@@ -1,61 +1,63 @@
-import React, { Component } from 'react'
-import logos from './logos.svg'
-import './App.css'
+import React, { useState } from "react";
+import "./App.css";
+import Map from "./Components/Map";
 
-class App extends Component {
-  state = {
-    count: 'loading...'
-  }
+const ZOOM = 12;
 
-  componentDidMount = async () => {
-    const { count } = await window.fetch(`/api/count`).then(res => res.json())
-    this.setState({ count })
-  }
+const App = (props) => {
+  const [geoLocation, setGeoLocation] = useState({
+    latitude: 50,
+    longitude: 50,
+  });
 
-  increment = async () => {
-    const { count } = await window
-      .fetch(`/api/count/increment`, { method: 'POST' })
-      .then(res => res.json())
-    this.setState({ count })
-  }
+  const clickHandler = async (ev) => {
+    ev.preventDefault();
+    const location = document.getElementById("search-location").value;
+    console.log(location);
+    let weatherDetails;
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logos} className="App-logo" alt="logo" />
-          <p>
-            {'Learn '}
-            <a href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-              React
-            </a>
-            {', '}
-            <a href="https://expressjs.com" target="_blank" rel="noopener noreferrer">
-              Express
-            </a>
-            {', and '}
-            <a href="https://kubernetes.io" target="_blank" rel="noopener noreferrer">
-              Kubernetes
-            </a>
-          </p>
-          <p>
-            Modify <code>src/www/App.js</code> or <code>src/api/index.js</code> to reload UI or API.
-          </p>
-          <p>
-            <code>yarn deploy</code> to build containers and deploy them to production
-          </p>
-          <hr />
-          <h2>Count: {this.state.count}</h2>
-          <p>
-            Call <code>/api/count/increment</code>
-            <button onClick={this.increment} className="App-button">
-              Go
+    try {
+      const googleResponse = await fetch(
+        `/api/v1/googlePlaces?location=${location}`
+      );
+      const { lat, lng } = await googleResponse.json();
+
+      setGeoLocation({
+        latitude: lat,
+        longitude: lng,
+      });
+
+      const weatherResponse = await fetch(
+        `/api/v1/weather?lat=${lat}&lng=${lng}`
+      );
+      weatherDetails = await weatherResponse.json();
+
+      console.log(weatherDetails);
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    const iconElem = document.getElementById("weather-image");
+    iconElem.src = `http://openweathermap.org/img/w/${weatherDetails.weather[0].icon}.png`;
+  };
+
+  return (
+    <div className="App">
+      <header className="App_header">
+        <div className="searchBar">
+          <form id="location-search-form">
+            <label for="search-location">Location</label>
+            <input id="search-location"></input>
+            <button type="submit" onClick={clickHandler}>
+              Search
             </button>
-          </p>
-        </header>
-      </div>
-    )
-  }
-}
+          </form>
+          <img id="weather-image" src=""></img>
+        </div>
+        <Map geoLocation={geoLocation} zoom={ZOOM} />
+      </header>
+    </div>
+  );
+};
 
-export default App
+export default App;
